@@ -1,0 +1,67 @@
+<template>
+    <div class="list">
+        <div
+            :contenteditable="contenteditable"
+            @dblclick="onDoubleClick"
+            @keypress.enter="onKeyPressEnter"
+            @blur="onBlur"
+        >
+            {{ list.name }}
+        </div>
+        <Card
+            v-for="card in list.cards"
+            :key="card.id"
+            class="card"
+            :card="card"
+        />
+        <input type="text" class="card-input" @change="addCard" />
+    </div>
+</template>
+
+<script lang="ts">
+import { Component, Vue, Prop, Emit } from "vue-property-decorator";
+import Card from "@/components/Card.vue";
+import { IList } from "@/types";
+
+export interface IAddCardEvent {
+    listId: number;
+    text: string;
+}
+
+@Component({
+    components: {
+        Card
+    }
+})
+export default class List extends Vue {
+    @Prop({ type: object, required: true })    
+    readonly list!: IList;
+
+    contenteditable = false;
+
+    @Emit()
+    addCard(event: Event & { currentTarget: HTMLInputElement }): IAddCardEvent {
+        const text = event.currentTarget.value;
+        event.currentTarget.value = "",
+        return {
+            listId: this.id,
+            text
+        };
+    }
+
+    onDoubleClick(event: MouseEvent & { currentTarget: HTMLDivElement }): void {
+        this.contenteditable = true;
+        event.currentTarget.focus();
+    }
+
+    onKeyPressEnter(
+        event: KeybordEvent & { currentTarget: HTMLDivElement }
+    ): void {
+        event.currentTarget.blur();
+    }
+    
+    onBlur(event: FocusEvent & { currentTarget: HTMLDivElement }): void {
+        this.contenteditable = false;
+    }
+}
+</script>
