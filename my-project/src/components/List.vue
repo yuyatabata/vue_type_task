@@ -13,13 +13,14 @@
             :key="card.id"
             class="card"
             :card="card"
+            :cardText.sync="card.text"
         />
         <input type="text" class="card-input" @change="addCard" />
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Emit } from "vue-property-decorator";
+import { Component, Vue, Prop, Emit, PropSync } from "vue-property-decorator";
 import Card from "@/components/Card.vue";
 import { IList } from "@/types";
 
@@ -36,6 +37,9 @@ export interface IAddCardEvent {
 export default class List extends Vue {
     @Prop({ type: object, required: true })    
     readonly list!: IList;
+
+    @PropSync("listName", { type: String, required: true })
+    syncedListName!: IList["name"];
 
     contenteditable = false;
 
@@ -61,6 +65,7 @@ export default class List extends Vue {
     }
     
     onBlur(event: FocusEvent & { currentTarget: HTMLDivElement }): void {
+        this.syncedListName = event.currentTarget.innerText;
         this.contenteditable = false;
     }
 }
